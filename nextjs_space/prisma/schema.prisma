@@ -1,0 +1,26 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/dashboard_cumplimiento/nextjs_space/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model CumplimientoRecord {
+  id                    String   @id @default(cuid())
+  dd_nombre            String   // DIRIS name
+  ee_nombre            String   // Establishment name  
+  esquema_actual       String   // Current schema
+  año_esquema_actual   Int      // Schema year
+  segmento             String?  // Age segment (only in esquema_vigente)
+  paciente_id          String   // Patient ID
+  condicion            String   // Patient condition (CONTINUADOR, NUEVO, DERIVADO)
+  cumplimiento         String   // Compliance status (SI/NO)
+  tipo_esquema         String   // Schema type (esquema_vigente, personalizados_orden_18, etc.)
+  created_at           DateTime @default(now())
+
+  @@map("cumplimiento_records")
+}
