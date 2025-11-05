@@ -36,7 +36,7 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
         <div>
           <h1 className="font-bold text-gray-900 text-lg">Cumplimiento</h1>
-          <p className="text-xs text-gray-600">Dashboard Médico</p>
+          <p className="text-xs text-gray-600">Dashboard</p>
         </div>
       </div>
 

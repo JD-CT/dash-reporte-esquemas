@@ -50,9 +50,9 @@ export function MainDashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-2">Dashboard de Cumplimiento Médico</h1>
+        <h1 className="text-2xl font-bold mb-2">Dashboard de Cumplimiento</h1>
         <p className="text-blue-100">
-          Análisis de casos de no cumplimiento en esquemas médicos por DIRIS
+          Análisis de casos de no cumplimiento en esquemas por DIRIS
         </p>
       </div>
 

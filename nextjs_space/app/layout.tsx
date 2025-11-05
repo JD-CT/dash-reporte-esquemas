@@ -8,15 +8,15 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Dashboard Cumplimiento Médico",
-  description: "Análisis de cumplimiento de esquemas médicos por DIRIS",
+  title: "Dashboard Cumplimiento",
+  description: "Análisis de cumplimiento de esquemas por DIRIS",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg"
   },
   openGraph: {
-    title: "Dashboard Cumplimiento Médico",
-    description: "Análisis interactivo de cumplimiento de esquemas médicos",
+    title: "Dashboard Cumplimiento",
+    description: "Análisis interactivo de cumplimiento de esquemas",
     images: ["/og-image.png"]
   }
 };
