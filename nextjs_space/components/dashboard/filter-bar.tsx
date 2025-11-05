@@ -6,24 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X, Filter } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { FilterOptions, DashboardFilters } from '@/lib/types';
 
 interface FilterBarProps {
-  onFiltersChange: (filters: {
-    diris: string;
-    esquema: string;
-    tipo: string;
-  }) => void;
-  filters: {
-    diris: string;
-    esquema: string;
-    tipo: string;
-  };
-}
-
-interface FilterOptions {
-  diris: string[];
-  esquemas: string[];
-  tipos: string[];
+  onFiltersChange: (filters: DashboardFilters) => void;
+  filters: DashboardFilters;
 }
 
 export function FilterBar({ onFiltersChange, filters }: FilterBarProps) {

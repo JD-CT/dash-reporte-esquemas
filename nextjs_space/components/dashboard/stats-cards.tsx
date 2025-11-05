@@ -4,15 +4,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Activity, AlertTriangle, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { DashboardStats } from '@/lib/types';
 
 interface StatsCardsProps {
-  stats: {
-    totalRecords: number;
-    dirisStats: { name: string; value: number }[];
-    esquemaStats: { name: string; value: number }[];
-    tipoStats: { name: string; value: number }[];
-    condicionStats: { name: string; value: number }[];
-  } | null;
+  stats: DashboardStats | null;
   loading: boolean;
 }
 

@@ -5,38 +5,17 @@ import { useState, useEffect } from 'react';
 import { FilterBar } from './filter-bar';
 import { StatsCards } from './stats-cards';
 import { ChartGrid } from './chart-grid';
-import { DataTable } from './data-table';
-
-interface DashboardStats {
-  totalRecords: number;
-  dirisStats: { name: string; value: number }[];
-  esquemaStats: { name: string; value: number }[];
-  tipoStats: { name: string; value: number }[];
-  condicionStats: { name: string; value: number }[];
-}
-
-interface DashboardRecord {
-  id: string;
-  dd_nombre: string;
-  ee_nombre: string;
-  esquema_actual: string;
-  año_esquema_actual: number;
-  segmento: string | null;
-  paciente_id: string;
-  condicion: string;
-  cumplimiento: string;
-  tipo_esquema: string;
-}
+import { DashboardStats, CumplimientoRecord, DashboardFilters } from '@/lib/types';
 
 export function MainDashboard() {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<DashboardFilters>({
     diris: 'all',
     esquema: 'all',
     tipo: 'all'
   });
   
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [records, setRecords] = useState<DashboardRecord[]>([]);
+  const [records, setRecords] = useState<CumplimientoRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [statsLoading, setStatsLoading] = useState(true);
 
@@ -54,19 +33,11 @@ export function MainDashboard() {
       if (filters.esquema !== 'all') params.append('esquema', filters.esquema);
       if (filters.tipo !== 'all') params.append('tipo', filters.tipo);
 
-      // Fetch stats and records in parallel
-      const [statsResponse, recordsResponse] = await Promise.all([
-        fetch(`/api/cumplimiento/stats?${params.toString()}`),
-        fetch(`/api/cumplimiento?${params.toString()}`)
-      ]);
-
-      const [statsData, recordsData] = await Promise.all([
-        statsResponse.json(),
-        recordsResponse.json()
-      ]);
+      // Fetch only stats (removed records fetch since we're removing the data table)
+      const statsResponse = await fetch(`/api/cumplimiento/stats?${params.toString()}`);
+      const statsData = await statsResponse.json();
 
       setStats(statsData);
-      setRecords(recordsData);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -101,12 +72,6 @@ export function MainDashboard() {
       <ChartGrid 
         stats={stats}
         loading={statsLoading}
-      />
-
-      {/* Data Table */}
-      <DataTable 
-        data={records}
-        loading={loading}
       />
     </div>
   );

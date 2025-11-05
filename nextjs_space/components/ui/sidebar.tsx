@@ -6,12 +6,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { 
   BarChart3, 
-  Database, 
-  FileText, 
-  TrendingUp,
-  Activity,
-  Users,
-  AlertTriangle
+  TrendingUp
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -20,40 +15,10 @@ interface SidebarProps {
 
 const menuItems = [
   {
-    title: 'Resumen General',
+    title: 'Dashboard Principal',
     href: '/',
     icon: BarChart3,
-    description: 'Vista general del cumplimiento'
-  },
-  {
-    title: 'Por DIRIS',
-    href: '/diris',
-    icon: Users,
-    description: 'Análisis por DIRIS'
-  },
-  {
-    title: 'Por Esquemas',
-    href: '/esquemas',
-    icon: Activity,
-    description: 'Análisis por esquemas médicos'
-  },
-  {
-    title: 'Casos Críticos',
-    href: '/criticos',
-    icon: AlertTriangle,
-    description: 'Casos de mayor impacto'
-  },
-  {
-    title: 'Datos Detallados',
-    href: '/datos',
-    icon: Database,
-    description: 'Tabla completa de datos'
-  },
-  {
-    title: 'Reportes',
-    href: '/reportes',
-    icon: FileText,
-    description: 'Generar reportes'
+    description: 'Vista completa de cumplimiento'
   }
 ];
 

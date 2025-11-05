@@ -24,19 +24,19 @@ def process_excel_file():
             'name': 'personalizados_cumple_',
             'skip_rows': 8,
             'compliance_col': 'personalizados_cumple_orden_18',
-            'tipo_esquema': 'personalizados_orden_18'
+            'tipo_esquema': 'personalizados_18'
         },
         {
             'name': 'personalizados_cumple_1',
             'skip_rows': 8,
             'compliance_col': 'personalizados_cumple_orden_niños_0a3',
-            'tipo_esquema': 'personalizados_orden_niños_0a3'
+            'tipo_esquema': 'personalizados_0a3'
         },
         {
             'name': 'personalizados_cumple_2',
             'skip_rows': 8,
             'compliance_col': 'personalizados_cumple_orden_niños_4a17',
-            'tipo_esquema': 'personalizados_orden_niños_4a17'
+            'tipo_esquema': 'personalizados_4a17'
         }
     ]
     
