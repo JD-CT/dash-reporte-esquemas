@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Cumplimiento de Esquemas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-title {
+            color: #2d3748;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .filter-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-label {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        canvas {
+            max-height: 400px;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Dashboard de Cumplimiento de Esquemas</h1>
+            <p class="subtitle">Análisis de casos de no cumplimiento por DIRIS y esquemas médicos</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-label">Total de Casos</div>
+                <div class="stat-value" id="totalCasos">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏥</div>
+                <div class="stat-label">DIRIS Afectadas</div>
+                <div class="stat-value" id="totalDiris">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💊</div>
+                <div class="stat-label">Esquemas Diferentes</div>
+                <div class="stat-value" id="totalEsquemas">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📑</div>
+                <div class="stat-label">Tipos de Hoja</div>
+                <div class="stat-value" id="totalHojas">-</div>
+            </div>
+        </div>
+
+        <div class="filter-container">
+            <span class="filter-label">Filtrar por tipo de hoja:</span>
+            <select id="hojaFilter">
+                <option value="all">Todas las hojas</option>
+                <option value="Esquema Vigente">Esquema Vigente</option>
+                <option value="Personaliz. 18+">Personaliz. 18+</option>
+                <option value="Personaliz. 0-3">Personaliz. 0-3</option>
+                <option value="Personaliz. 4-17">Personaliz. 4-17</option>
+            </select>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card full-width">
+                <h2 class="chart-title">📍 Casos de No Cumplimiento por DIRIS</h2>
+                <canvas id="dirisChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h2 class="chart-title">📊 Distribución por Tipo de Hoja</h2>
+                <canvas id="hojaChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h2 class="chart-title">💊 Top 10 Esquemas Más Afectados</h2>
+                <canvas id="esquemaChart"></canvas>
+            </div>
+        </div>
+
+        <footer>
+            <p>Dashboard generado automáticamente | Datos actualizados: <span id="fechaActual"></span></p>
+        </footer>
+    </div>
+
+    <script>
+        let allData = [];
+        let charts = {};
+
+        // Cargar datos
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                allData = await response.json();
+                updateDashboard('all');
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                alert('Error al cargar los datos. Asegúrate de que data.json está disponible.');
+            }
+        }
+
+        function updateDashboard(hojaFilter) {
+            // Filtrar datos según la hoja seleccionada
+            let filteredData = hojaFilter === 'all' 
+                ? allData 
+                : allData.filter(d => d.tipo_esquema === hojaFilter);
+
+            // Actualizar estadísticas
+            document.getElementById('totalCasos').textContent = filteredData.length.toLocaleString();
+
+            // Contar DIRIS únicas
+            const dirisUnicos = new Set(filteredData.map(d => d.dd_nombre));
+            document.getElementById('totalDiris').textContent = dirisUnicos.size;
+
+            // Contar esquemas únicos
+            const esquemasUnicos = new Set(filteredData.map(d => d.esquema_actual));
+            document.getElementById('totalEsquemas').textContent = esquemasUnicos.size;
+
+            // Contar tipos de hoja
+            const hojasUnicas = new Set(filteredData.map(d => d.tipo_esquema));
+            document.getElementById('totalHojas').textContent = hojasUnicas.size;
+
+            // Actualizar gráficos
+            updateDirisChart(filteredData);
+            updateHojaChart(allData); // Siempre muestra todas las hojas
+            updateEsquemaChart(filteredData);
+        }
+
+        function updateDirisChart(data) {
+            const dirisCounts = {};
+            data.forEach(d => {
+                dirisCounts[d.dd_nombre] = (dirisCounts[d.dd_nombre] || 0) + 1;
+            });
+
+            // Ordenar por cantidad
+            const sortedDiris = Object.entries(dirisCounts)
+                .sort((a, b) => b[1] - a[1]);
+
+            const labels = sortedDiris.map(d => d[0]);
+            const values = sortedDiris.map(d => d[1]);
+
+            if (charts.diris) charts.diris.destroy();
+
+            const ctx = document.getElementById('dirisChart').getContext('2d');
+            charts.diris = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Casos de No Cumplimiento',
+                        data: values,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateHojaChart(data) {
+            const hojaCounts = {};
+            data.forEach(d => {
+                hojaCounts[d.tipo_esquema] = (hojaCounts[d.tipo_esquema] || 0) + 1;
+            });
+
+            const labels = Object.keys(hojaCounts);
+            const values = Object.values(hojaCounts);
+
+            if (charts.hoja) charts.hoja.destroy();
+
+            const ctx = document.getElementById('hojaChart').getContext('2d');
+            charts.hoja = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(237, 100, 166, 0.8)',
+                            'rgba(255, 154, 158, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: 'white'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateEsquemaChart(data) {
+            const esquemaCounts = {};
+            data.forEach(d => {
+                esquemaCounts[d.esquema_actual] = (esquemaCounts[d.esquema_actual] || 0) + 1;
+            });
+
+            // Top 10 esquemas
+            const sortedEsquemas = Object.entries(esquemaCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            const labels = sortedEsquemas.map(d => d[0]);
+            const values = sortedEsquemas.map(d => d[1]);
+
+            if (charts.esquema) charts.esquema.destroy();
+
+            const ctx = document.getElementById('esquemaChart').getContext('2d');
+            charts.esquema = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Casos',
+                        data: values,
+                        backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                        borderColor: 'rgba(118, 75, 162, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listeners
+        document.getElementById('hojaFilter').addEventListener('change', (e) => {
+            updateDashboard(e.target.value);
+        });
+
+        // Mostrar fecha actual
+        document.getElementById('fechaActual').textContent = new Date().toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Cargar datos al iniciar
+        loadData();
+    </script>
+</body>
+</html>
